@@ -33,8 +33,8 @@ if __name__ == "__main__":
 
     model = AutoModelForCausalLM.from_pretrained(args.model_path_or_url or repo_id)
 
-
     def preprocess(examples: dict) -> dict:
+        global n_errors
         kigos = examples.pop("kigos")
         haiku = examples.pop("haiku")
         # format: '<s>Kigos[SEP]Haiku</s>' + [PAD] until reaching max length
@@ -42,9 +42,11 @@ if __name__ == "__main__":
         results = tokenizer(text, max_length=args.max_length, padding="max_length", return_tensors="pt")
         results["labels"] = results["input_ids"].clone()
         return results
-    
-        
+
     dataset = dataset.map(preprocess)
+    print("== Without filtering ==\n", dataset)
+    dataset = dataset.filter(lambda examples: tokenizer.unk_token_id not in examples["input_ids"][0]) # remove the rows where the kanjis are unknown
+    print("== After filtering ==\n", dataset)
 
     training_args = TrainingArguments(
         output_dir=args.output_dir,
@@ -66,4 +68,3 @@ if __name__ == "__main__":
     trainer.save_model()
 
     results = trainer.evaluate()
-    print(results)
