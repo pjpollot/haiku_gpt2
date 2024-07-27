@@ -11,11 +11,12 @@ this_dir = os.path.dirname(__file__)
 
 def parse_arguments() -> Namespace:
     parser = ArgumentParser()
+    parser.add_argument("-m", "--model_path_or_url", type=str)
     parser.add_argument("-o", "--output_dir", type=str, default=os.path.join(this_dir, "outputs"))
     parser.add_argument("--max_length", type=int, default=40)
-    parser.add_argument("--train_batch_size", type=int, default=4)
+    parser.add_argument("--train_batch_size", type=int, default=8)
     parser.add_argument("--test_batch_size", type=int, default=1)
-    parser.add_argument("-n", "--num_epochs", type=int, default=1)
+    parser.add_argument("-n", "--num_epochs", type=int, default=10)
     return parser.parse_args()
 
 
@@ -30,7 +31,7 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained(repo_id, use_fast=False)
     tokenizer.do_lower_case = True
 
-    model = AutoModelForCausalLM.from_pretrained(repo_id)
+    model = AutoModelForCausalLM.from_pretrained(args.model_path_or_url or repo_id)
 
 
     def preprocess(examples: dict) -> dict:
