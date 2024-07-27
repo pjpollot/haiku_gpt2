@@ -1,7 +1,8 @@
 import os
 
-from transformers import AutoTokenizer, AutoModelForCausalLM
 from argparse import ArgumentParser, Namespace
+
+from pipeline import KigosHaikuPipeline
 
 
 def parse_arguments() -> Namespace:
@@ -22,13 +23,8 @@ model_path = os.path.join(
 if __name__ == "__main__":
     args = parse_arguments()
 
-    tokenizer = AutoTokenizer.from_pretrained("rinna/japanese-gpt2-xsmall", use_fast=False)
-    tokenizer.do_lower_case = True
-    model = AutoModelForCausalLM.from_pretrained(args.model_path_or_url)
+    pipe = KigosHaikuPipeline(args.model_path_or_url)
 
-    text = tokenizer.bos_token + args.kigos + tokenizer.sep_token
-    input = tokenizer.encode(text, return_tensors="pt")
-    outputs = model.generate(input, do_sample=True, max_length=args.max_length, num_return_sequences=args.n_samples)
-    for i, out in enumerate(outputs):
-        sentence = tokenizer.decode(out.tolist())
+    outputs = pipe.sample_haikus(args.kigos, n_samples=args.n_samples, max_length=args.max_length)
+    for i, sentence in enumerate(outputs):
         print(i+1, sentence, "\n")
