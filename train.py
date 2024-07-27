@@ -50,8 +50,8 @@ if __name__ == "__main__":
         eval_strategy="epoch",
         #fp16=True,
         num_train_epochs=args.num_epochs,
-        per_device_train_batch_size=args.batch_size,
-        per_device_eval_batch_size=args.batch_size,
+        per_device_train_batch_size=args.train_batch_size,
+        per_device_eval_batch_size=args.test_batch_size,
         optim="adamw_torch",
         save_safetensors=True,
         save_strategy="epoch",
@@ -59,7 +59,7 @@ if __name__ == "__main__":
         logging_dir=os.path.join(this_dir, "logs"),
     )
 
-    trainer = Trainer(model, training_args, train_dataset=dataset["train"], eval_dataset=dataset["test"], compute_metrics=compute_metrics)
+    trainer = Trainer(model, training_args, train_dataset=dataset["train"], eval_dataset=dataset["test"])
     trainer.train()
 
     trainer.save_model()
