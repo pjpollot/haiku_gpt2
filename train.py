@@ -20,6 +20,7 @@ def parse_arguments() -> Namespace:
     parser.add_argument("--train_batch_size", type=int, default=8)
     parser.add_argument("--test_batch_size", type=int, default=1)
     parser.add_argument("-n", "--num_epochs", type=int, default=10)
+    parser.add_argument("--save_strategy", type=str, choices=["no", "epoch"], default="no")
     parser.add_argument("--use_fp16", action="store_true")
     return parser.parse_args()
 
@@ -49,8 +50,8 @@ if __name__ == "__main__":
 
     training_args = TrainingArguments(
         output_dir=args.output_dir,
-        eval_strategy="epoch",
-        save_strategy="epoch",
+        eval_strategy=args.save_strategy,
+        save_strategy=args.save_strategy,
         logging_strategy="epoch",
         fp16=args.use_fp16,
         num_train_epochs=args.num_epochs,
